@@ -4,19 +4,23 @@ import { generateLogsExcel } from '@/app/lib/excelGenerator';
 
 export const runtime = 'nodejs';
 
-function getDayRange(dateStr) {
-  const date = new Date(dateStr);
-  const start = new Date(date);
-  start.setHours(0, 0, 0, 0);
-  const end = new Date(date);
-  end.setHours(23, 59, 59, 999);
-  return { start, end, date };
+function parseLocalDate(dateStr) {
+  if (!dateStr) return null;
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return new Date(y, m - 1, d, 0, 0, 0, 0);
 }
-
+function getDayRange(dateStr) {
+  const base = parseLocalDate(dateStr);
+  const start = new Date(base.getFullYear(), base.getMonth(), base.getDate(), 0, 0, 0, 0);
+  const end = new Date(base.getFullYear(), base.getMonth(), base.getDate(), 23, 59, 59, 999);
+  return { start, end, date: base };
+}
 function parseDateTime(dateStr, timeOrIso) {
   if (!timeOrIso) return null;
   if (timeOrIso.includes('T')) return new Date(timeOrIso);
-  return new Date(`${dateStr}T${timeOrIso}:00`);
+  const [hh, mm] = timeOrIso.split(':').map(Number);
+  const base = parseLocalDate(dateStr);
+  return new Date(base.getFullYear(), base.getMonth(), base.getDate(), hh, mm, 0, 0);
 }
 
 export async function GET(req) {
@@ -46,7 +50,6 @@ export async function GET(req) {
     if (fromParam) createdAt.$gte = new Date(fromParam);
     if (toParam) createdAt.$lte = new Date(toParam);
     query.createdAt = createdAt;
-    // keep excelDate = today for filename
   }
 
   const logs = await Log.find(query).populate('product').sort({ createdAt: -1 });

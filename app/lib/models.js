@@ -20,7 +20,7 @@ const logSchema = new mongoose.Schema({
 });
 
 // Auto-delete logs 30 days after createdAt
-logSchema.index({ createdAt: 1 }, { expireAfterSeconds: 30 * 24 * 60 * 60 });
+logSchema.index({ createdAt: 1 }, { expireAfterSeconds: 5 * 30 * 24 * 60 * 60 });
 
 export const Product = mongoose.models.Product || mongoose.model('Product', productSchema);
 export const Transaction = mongoose.models.Transaction || mongoose.model('Transaction', transactionSchema);

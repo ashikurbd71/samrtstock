@@ -218,8 +218,8 @@ export default function LogTable() {
                 <th className="py-3 px-4">Product</th>
                 <th className="py-3 px-4">Event</th>
                 <th className="py-3 px-4">Date & Time</th>
-                <th className="py-3 px-4">Count</th>
-                <th className="py-3 px-4">Action Amount</th>
+                {/* <th className="py-3 px-4">Count</th> */}
+                <th className="py-3 px-4">Amount</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -232,7 +232,7 @@ export default function LogTable() {
                     </span>
                   </td>
                   <td className="py-2.5 px-4">{formatDate(log.createdAt)}</td>
-                  <td className="py-2.5 px-4">{log.summary?.count ?? '—'}</td>
+                  {/* <td className="py-2.5 px-4">{log.summary?.count ?? '—'}</td> */}
                   <td className="py-2.5 px-4">
                     {log.summary
                       ? `${log.summary.stockAmount} ${log.summary.stockLabel ? `(${log.summary.stockLabel})` : ''}`

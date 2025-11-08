@@ -1,4 +1,3 @@
-// In module imports (add Transaction, Product)
 import { NextResponse } from 'next/server';
 import { dbConnect } from '@/app/lib/dbConnect';
 import { Log, Transaction, Product } from '@/app/lib/models';
@@ -20,21 +19,25 @@ export async function GET(req) {
     query.product = productId;
   }
 
-  // Build createdAt range filter: supports date-only and time window within date,
-  // or ISO from/to without date.
+  // Replace string-based UTC parsing with local date construction
+  function parseLocalDate(dateStr) {
+    if (!dateStr) return null;
+    const [y, m, d] = dateStr.split('-').map(Number);
+    return new Date(y, m - 1, d, 0, 0, 0, 0);
+  }
   function getDayRange(dateStr) {
-    const date = new Date(dateStr);
-    const start = new Date(date);
-    start.setHours(0, 0, 0, 0);
-    const end = new Date(date);
-    end.setHours(23, 59, 59, 999);
+    const base = parseLocalDate(dateStr);
+    const start = new Date(base.getFullYear(), base.getMonth(), base.getDate(), 0, 0, 0, 0);
+    const end = new Date(base.getFullYear(), base.getMonth(), base.getDate(), 23, 59, 59, 999);
     return { start, end };
   }
   function parseDateTime(dateStr, timeOrIso) {
     if (!timeOrIso) return null;
-    if (timeOrIso.includes('T')) return new Date(timeOrIso);
-    // Treat as HH:mm within provided date
-    return new Date(`${dateStr}T${timeOrIso}:00`);
+    if (timeOrIso.includes('T')) return new Date(timeOrIso); // allow ISO
+    // Treat as local HH:mm within provided date
+    const [hh, mm] = timeOrIso.split(':').map(Number);
+    const base = parseLocalDate(dateStr);
+    return new Date(base.getFullYear(), base.getMonth(), base.getDate(), hh, mm, 0, 0);
   }
 
   if (dateParam) {
@@ -53,7 +56,7 @@ export async function GET(req) {
   }
   const logs = await Log.find(query).populate('product').sort({ createdAt: -1 });
 
-  // Build per-product counts from logs
+  // Build per-product counts from logs within the current filter
   const productCounts = new Map();
   const productIds = [];
   for (const lg of logs) {
@@ -63,66 +66,39 @@ export async function GET(req) {
     if (!productIds.includes(pid)) productIds.push(pid);
   }
 
-  // Map log event -> transaction type + label
+  const txQuery = {};
+  if (productIds.length) txQuery.product = { $in: productIds };
+  if (query.createdAt) txQuery.createdAt = query.createdAt;
+
+  const txs = await Transaction.find(txQuery).select('product type quantity createdAt');
+  const txTotalsByProduct = new Map();
+  for (const tx of txs) {
+    const pid = tx.product?.toString();
+    if (!pid) continue;
+    const totals = txTotalsByProduct.get(pid) || { IN: 0, OUT: 0, RESTOCK: 0, RETURN: 0 };
+    totals[tx.type] += tx.quantity;
+    txTotalsByProduct.set(pid, totals);
+  }
+
   const eventToTxType = {
     STOCKED: { type: 'IN', label: 'stock in' },
     OUT_OF_STOCK: { type: 'OUT', label: 'stock out' },
     REFUNDED: { type: 'RETURN', label: 'refund' },
   };
 
-  // Query transactions for the same products in the same time window
-  const txQuery = {};
-  if (productIds.length) txQuery.product = { $in: productIds };
-  if (query.createdAt) txQuery.createdAt = query.createdAt;
-
-  const txs = await Transaction.find(txQuery).select('product type quantity createdAt');
-
-  // Index transactions by product+type and sort by createdAt for nearest matching
-  const txByProductType = new Map();
-  for (const tx of txs) {
-    const pid = tx.product?.toString();
-    if (!pid) continue;
-    const key = `${pid}:${tx.type}`;
-    const arr = txByProductType.get(key) || [];
-    arr.push(tx);
-    txByProductType.set(key, arr);
-  }
-  for (const [key, arr] of txByProductType) {
-    arr.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-  }
-
-  // Helper: find nearest transaction quantity to a log's timestamp for the mapped type
-  function findNearestActionQuantity(pid, type, logDate) {
-    if (!pid || !type) return 0;
-    const key = `${pid}:${type}`;
-    const arr = txByProductType.get(key) || [];
-    if (arr.length === 0) return 0;
-    const t = new Date(logDate).getTime();
-    let bestQty = 0;
-    let bestDiff = Number.POSITIVE_INFINITY;
-    for (const tx of arr) {
-      const diff = Math.abs(new Date(tx.createdAt).getTime() - t);
-      if (diff < bestDiff) {
-        bestDiff = diff;
-        bestQty = tx.quantity || 0;
-      }
-    }
-    return bestQty;
-  }
-
-  // Attach per-action quantity and count to each log item
   const augmented = logs.map((lg) => {
     const pid = lg.product?._id?.toString() || lg.product?.toString();
     const count = pid ? (productCounts.get(pid) || 0) : 0;
     const mapping = eventToTxType[lg.event] || { type: null, label: '' };
-    const actionAmount = findNearestActionQuantity(pid, mapping.type, lg.createdAt);
+    const totals = pid ? (txTotalsByProduct.get(pid) || { IN: 0, OUT: 0, RESTOCK: 0, RETURN: 0 }) : { IN: 0, OUT: 0, RESTOCK: 0, RETURN: 0 };
+    const stockAmount = mapping.type ? totals[mapping.type] : 0;
 
     return {
       ...lg.toObject(),
       summary: {
         count,
-        stockAmount: actionAmount,       // per-action quantity
-        stockLabel: mapping.label,       // e.g., "(stock in)"
+        stockAmount,
+        stockLabel: mapping.label,
       },
     };
   });

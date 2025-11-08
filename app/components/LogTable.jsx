@@ -14,6 +14,7 @@ export default function LogTable() {
   const [toTime, setToTime] = useState('');
   const [productQuery, setProductQuery] = useState('');
   const [showTxModal, setShowTxModal] = useState(false);
+  const [newOnly, setNewOnly] = useState(true);
 
   useEffect(() => {
     reload();
@@ -31,6 +32,7 @@ export default function LogTable() {
       if (date) params.set('date', date);
       if (fromTime) params.set('from', fromTime); // HH:mm
       if (toTime) params.set('to', toTime);       // HH:mm
+      if (newOnly) params.set('newOnly', '1');
       const res = await fetch(`/api/logs?${params.toString()}`);
       const data = await res.json();
       setLogs(Array.isArray(data) ? data : []);
@@ -158,6 +160,17 @@ export default function LogTable() {
             className="w-56 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
+        <div className="flex items-center gap-2">
+          <input
+            id="only-new-products"
+            type="checkbox"
+            checked={newOnly}
+            onChange={(e) => setNewOnly(e.target.checked)}
+          />
+          <label htmlFor="only-new-products" className="text-sm text-gray-700">
+            Only newly added products
+          </label>
+        </div>
         <div className="ml-auto flex items-center gap-2">
           <button
             onClick={reload}
@@ -171,6 +184,7 @@ export default function LogTable() {
               setDate(today);
               setFromTime('');
               setToTime('');
+              setNewOnly(true);
               reload();
             }}
             className="px-3 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-50 text-sm"
@@ -204,6 +218,8 @@ export default function LogTable() {
                 <th className="py-3 px-4">Product</th>
                 <th className="py-3 px-4">Event</th>
                 <th className="py-3 px-4">Date & Time</th>
+                <th className="py-3 px-4">Count</th>
+                <th className="py-3 px-4">Action Amount</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -216,6 +232,12 @@ export default function LogTable() {
                     </span>
                   </td>
                   <td className="py-2.5 px-4">{formatDate(log.createdAt)}</td>
+                  <td className="py-2.5 px-4">{log.summary?.count ?? '—'}</td>
+                  <td className="py-2.5 px-4">
+                    {log.summary
+                      ? `${log.summary.stockAmount} ${log.summary.stockLabel ? `(${log.summary.stockLabel})` : ''}`
+                      : '—'}
+                  </td>
                 </tr>
               ))}
             </tbody>

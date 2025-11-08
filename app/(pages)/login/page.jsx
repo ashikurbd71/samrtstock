@@ -33,7 +33,10 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="max-w-md min-h-screen mx-auto mt-16 rounded-2xl bg-white shadow-sm border border-gray-200 p-6">
+
+      <div className='min-h-screen'>
+          
+ <div className="max-w-md  mx-auto mt-16 rounded-2xl bg-white shadow-sm border border-gray-200 p-6">
       <h1 className="text-2xl font-semibold mb-4">Login</h1>
       <p className="text-sm text-gray-600 mb-6">Enter your credentials to access SmartStock.</p>
 
@@ -77,5 +80,7 @@ export default function LoginPage() {
         </button>
       </form>
     </div>
+      </div>
+   
   );
 }

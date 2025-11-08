@@ -212,41 +212,42 @@ export default function LogTable(props) {
         </div>
       ) : (
         <div className="w-full">
-            {/* Mobile-friendly horizontal scroll */}
-            <div className="w-full overflow-x-auto md:overflow-visible">
-                {/* Responsive font sizes and spacing */}
-                <table className="min-w-[640px] sm:min-w-full w-full text-xs sm:text-sm md:text-base leading-tight">
-                    <thead className="bg-gray-50">
-                        <tr>
-                            {/* Example header updated for responsiveness */}
-                            <th className="py-2 sm:py-3 px-2 sm:px-4 text-left">Amount</th>
-                            <th className="py-3 px-4">Event</th>
-                            <th className="py-3 px-4">Date & Time</th>
-                            {/* <th className="py-3 px-4">Count</th> */}
-                            <th className="py-3 px-4">Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                      {filteredLogs.map((log) => (
-                        <tr key={log._id} className="hover:bg-gray-50">
-                          <td className="py-2.5 px-4">{log.product?.name || '—'}</td>
-                          <td className="py-2.5 px-4">
-                            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs ${eventChipClasses(log.event)}`}>
-                              {log.event}
-                            </span>
-                          </td>
-                          <td className="py-2.5 px-4">{formatDate(log.createdAt)}</td>
-                          {/* <td className="py-2.5 px-4">{log.summary?.count ?? '—'}</td> */}
-                          <td className="py-2.5 px-4">
-                            {log.summary
-                              ? `${log.summary.stockAmount} ${log.summary.stockLabel ? `(${log.summary.stockLabel})` : ''}`
-                              : '—'}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                </table>
+          {/* Mobile-friendly horizontal scroll */}
+          <div className="px-6 pb-6 overflow-hidden rounded-xl ring-1 ring-gray-200">
+            <div className="max-h-[60vh] overflow-auto">
+              <table className="min-w-full table-auto text-sm">
+                <thead className="bg-gray-50 sticky top-0 z-10">
+                  <tr>
+                    {/* Example header updated for responsiveness */}
+                    <th className="py-3 px-4 text-left font-semibold text-gray-700">Product</th>
+                    <th className="py-3 px-4 text-center font-semibold text-gray-700">Event</th>
+                    <th className="py-3 px-4 text-left font-semibold text-gray-700">Date & Time</th>
+                    {/* <th className="py-3 px-4">Count</th> */}
+                    <th className="py-3 px-4 text-right font-semibold text-gray-700">Amount</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {filteredLogs.map((log) => (
+                    <tr key={log._id} className="hover:bg-gray-50">
+                      <td className="py-2.5 px-4 text-left">{log.product?.name || '—'}</td>
+                      <td className="py-2.5 px-4 text-center">
+                        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs ${eventChipClasses(log.event)}`}>
+                          {log.event}
+                        </span>
+                      </td>
+                      <td className="py-2.5 px-4 text-left whitespace-nowrap">{formatDate(log.createdAt)}</td>
+                      {/* <td className="py-2.5 px-4">{log.summary?.count ?? '—'}</td> */}
+                      <td className="py-2.5 px-4 text-right whitespace-nowrap">
+                        {log.summary
+                          ? `${log.summary.stockAmount} ${log.summary.stockLabel ? `(${log.summary.stockLabel})` : ''}`
+                          : '—'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
+          </div>
         </div>
       )}
     </section>

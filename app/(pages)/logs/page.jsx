@@ -10,7 +10,7 @@ export default function Page() {
         <p className="text-sm mt-1 opacity-90">Explore and export inventory events.</p>
       </section>
       {/* Wrap the table to allow horizontal scroll on phones */}
-      <section className="w-full overflow-x-auto md:overflow-visible">
+      <section className="w-full  overflow-x-auto md:overflow-visible">
         <LogTable />
       </section>
     </main>

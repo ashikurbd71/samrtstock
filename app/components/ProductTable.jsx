@@ -100,18 +100,18 @@ export default function ProductTable() {
 
   return (
     <section className="rounded-2xl bg-white shadow-sm border border-gray-200">
-      <div className="p-6 flex items-center justify-between gap-4">
+      <div className="p-6 flex lg:flex-row flex-col items-center justify-between gap-4">
         <div>
           <h2 className="text-lg font-semibold">Products</h2>
           <p className="text-sm text-gray-600 mt-1">Manage items and stock levels.</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex lg:flex-row flex-col items-center gap-2 w-full lg:w-auto flex-wrap">
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search products..."
-            className="w-56 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full sm:w-56 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <button
             onClick={loadProducts}
@@ -142,8 +142,8 @@ export default function ProductTable() {
             </button>
           </div>
         ) : (
-          <div className="overflow-hidden rounded-lg border border-gray-200">
-            <table className="w-full text-left text-sm">
+          <div className="overflow-x-auto rounded-lg border border-gray-200">
+            <table className="min-w-[640px] w-full text-left text-sm">
               <thead className="bg-gray-50">
                 <tr>
                   <th
@@ -159,7 +159,7 @@ export default function ProductTable() {
                     Total Stock {sortBy === 'totalStock' ? (sortDir === 'asc' ? '↑' : '↓') : ''}
                   </th>
                   <th
-                    className="py-3 px-4 cursor-pointer select-none"
+                    className="py-3 px-4 cursor-pointer select-none hidden md:table-cell"
                     onClick={() => toggleSort('createdAt')}
                   >
                     Created {sortBy === 'createdAt' ? (sortDir === 'asc' ? '↑' : '↓') : ''}
@@ -175,7 +175,7 @@ export default function ProductTable() {
                         <input
                           value={editedName}
                           onChange={(e) => setEditedName(e.target.value)}
-                          className="border rounded-md px-2 py-1 w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="border rounded-md px-2 py-1 w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                       ) : (
                         <div className="flex items-center gap-2">
@@ -193,7 +193,9 @@ export default function ProductTable() {
                       )}
                     </td>
                     <td className="py-2.5 px-4">{p.totalStock}</td>
-                    <td className="py-2.5 px-4">{new Date(p.createdAt).toLocaleString()}</td>
+                    <td className="py-2.5 px-4 hidden md:table-cell">
+                      {new Date(p.createdAt).toLocaleString()}
+                    </td>
                     <td className="py-2.5 px-4">
                       {editingId === p._id ? (
                         <div className="flex gap-2">

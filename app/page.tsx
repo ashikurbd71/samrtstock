@@ -7,12 +7,12 @@ import StockChart from './components/StockChart';
 
 export default function Home() {
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 px-5 lg:px-8">
       {/* Hero */}
       <section className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-600 via-blue-600 to-cyan-500 text-white shadow-lg">
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
         <div className="px-8 py-10">
-          <h1 className="text-3xl md:text-4xl font-semibold tracking-tight">SmartStock Dashboard</h1>
+          <h1 className="text-2xl md:text-4xl font-semibold tracking-tight">SmartStock Dashboard</h1>
           <p className="mt-2 text-sm md:text-base text-white/80">
             Manage inventory, track trends, and export daily reports.
           </p>

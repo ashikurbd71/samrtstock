@@ -5,7 +5,7 @@ import Link from 'next/link';
 import TransactionForm from './TransactionForm';
 import { format } from 'date-fns';
 
-export default function LogTable() {
+export default function LogTable(props) {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(false);
@@ -85,12 +85,12 @@ export default function LogTable() {
 
   return (
     <section className="rounded-2xl bg-white shadow-sm border border-gray-200">
-      <div className="p-6 flex items-center justify-between gap-4">
+      <div className="p-6 flex items-center lg:flex-row flex-col justify-between gap-4">
         <div>
           <h2 className="text-lg font-semibold">Product Activity Logs</h2>
           <p className="text-sm text-gray-600 mt-1">Filter, search and export entries.</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex lg:flex-row flex-col items-center gap-2">
           <button
             onClick={reload}
             className="px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-sm"
@@ -211,37 +211,42 @@ export default function LogTable() {
           </div>
         </div>
       ) : (
-        <div className="px-6 pb-6 overflow-hidden rounded-lg border border-gray-200">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="py-3 px-4">Product</th>
-                <th className="py-3 px-4">Event</th>
-                <th className="py-3 px-4">Date & Time</th>
-                {/* <th className="py-3 px-4">Count</th> */}
-                <th className="py-3 px-4">Amount</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {filteredLogs.map((log) => (
-                <tr key={log._id} className="hover:bg-gray-50">
-                  <td className="py-2.5 px-4">{log.product?.name || '—'}</td>
-                  <td className="py-2.5 px-4">
-                    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs ${eventChipClasses(log.event)}`}>
-                      {log.event}
-                    </span>
-                  </td>
-                  <td className="py-2.5 px-4">{formatDate(log.createdAt)}</td>
-                  {/* <td className="py-2.5 px-4">{log.summary?.count ?? '—'}</td> */}
-                  <td className="py-2.5 px-4">
-                    {log.summary
-                      ? `${log.summary.stockAmount} ${log.summary.stockLabel ? `(${log.summary.stockLabel})` : ''}`
-                      : '—'}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="w-full">
+            {/* Mobile-friendly horizontal scroll */}
+            <div className="w-full overflow-x-auto md:overflow-visible">
+                {/* Responsive font sizes and spacing */}
+                <table className="min-w-[640px] sm:min-w-full w-full text-xs sm:text-sm md:text-base leading-tight">
+                    <thead className="bg-gray-50">
+                        <tr>
+                            {/* Example header updated for responsiveness */}
+                            <th className="py-2 sm:py-3 px-2 sm:px-4 text-left">Amount</th>
+                            <th className="py-3 px-4">Event</th>
+                            <th className="py-3 px-4">Date & Time</th>
+                            {/* <th className="py-3 px-4">Count</th> */}
+                            <th className="py-3 px-4">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {filteredLogs.map((log) => (
+                        <tr key={log._id} className="hover:bg-gray-50">
+                          <td className="py-2.5 px-4">{log.product?.name || '—'}</td>
+                          <td className="py-2.5 px-4">
+                            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs ${eventChipClasses(log.event)}`}>
+                              {log.event}
+                            </span>
+                          </td>
+                          <td className="py-2.5 px-4">{formatDate(log.createdAt)}</td>
+                          {/* <td className="py-2.5 px-4">{log.summary?.count ?? '—'}</td> */}
+                          <td className="py-2.5 px-4">
+                            {log.summary
+                              ? `${log.summary.stockAmount} ${log.summary.stockLabel ? `(${log.summary.stockLabel})` : ''}`
+                              : '—'}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
       )}
     </section>

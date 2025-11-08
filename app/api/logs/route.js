@@ -49,11 +49,17 @@ export async function GET(req) {
       ...(toDt ? { $lte: toDt } : { $lte: end }),
     };
   } else if (fromParam || toParam) {
-    const createdAt = {};
-    if (fromParam) createdAt.$gte = new Date(fromParam);
-    if (toParam) createdAt.$lte = new Date(toParam);
-    query.createdAt = createdAt;
+    // Interpret standalone time filters as times on today's local date
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const { start, end } = getDayRange(todayStr);
+    const fromDt = parseDateTime(todayStr, fromParam);
+    const toDt = parseDateTime(todayStr, toParam);
+    query.createdAt = {
+      ...(fromDt ? { $gte: fromDt } : { $gte: start }),
+      ...(toDt ? { $lte: toDt } : { $lte: end }),
+    };
   }
+
   const logs = await Log.find(query).populate('product').sort({ createdAt: -1 });
 
   // Build per-product counts from logs within the current filter

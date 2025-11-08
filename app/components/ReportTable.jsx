@@ -46,15 +46,15 @@ function ReportTable(_props, ref) {
   );
 
   return (
-    <section className="bg-white rounded-2xl shadow-sm border border-gray-200">
+    <section className="bg-white rounded-2xl shadow-sm border border-gray-50">
       <div className="p-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-2">
+        <div className="flex lg:flex-row flex-col items-center gap-2">
           <label className="text-sm text-gray-600">Date</label>
           <input
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="rounded-lg border border-gray-50 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <button
             onClick={() => loadReport(date)}
@@ -69,13 +69,13 @@ function ReportTable(_props, ref) {
             Today
           </button>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex lg:flex-row flex-col items-center gap-2">
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search product..."
-            className="w-56 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-56 rounded-lg border border-gray-50 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <DownloadButton date={date} />
         </div>
@@ -110,7 +110,7 @@ function ReportTable(_props, ref) {
           </div>
         </div>
       ) : (
-        <div className="px-6 pb-6 overflow-hidden rounded-lg border border-gray-200">
+        <div className="px-6 pb-6 overflow-hidden rounded-lg border border-gray-50">
           <div className="max-h-[60vh] overflow-auto">
             <table className="w-full text-left text-sm">
               <thead className="bg-gray-50 sticky top-0 z-10">
@@ -161,7 +161,7 @@ function ReportTable(_props, ref) {
                 )}
               </tbody>
               <tfoot>
-                <tr className="border-t font-medium bg-gray-50">
+                <tr className="border-t border-blue-400 font-bold bg-gray-50">
                   <td className="py-2.5 px-4">Totals</td>
                   <td className="py-2.5 px-4">{totalsAll.IN}</td>
                   <td className="py-2.5 px-4">{totalsAll.OUT}</td>

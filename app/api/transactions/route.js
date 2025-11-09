@@ -26,8 +26,11 @@ export async function POST(req) {
   let newStock = prod.totalStock;
   if (type === 'OUT') {
     newStock = Math.max(0, newStock - quantity);
-  } else {
+  } else if (type === 'IN' || type === 'RESTOCK') {
     newStock = newStock + quantity;
+  } else if (type === 'RETURN') {
+    // no change to stock for returns
+    newStock = newStock;
   }
   prod.totalStock = newStock;
   await prod.save();

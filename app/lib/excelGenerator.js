@@ -93,6 +93,45 @@ export async function generateDailyReportExcel(dateObj, transactions, products) 
   return { buffer, filename };
 }
 
+export async function generateProductsExcel(products, dateObj = new Date()) {
+  const yyyy = dateObj.getFullYear();
+  const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+  const dd = String(dateObj.getDate()).padStart(2, '0');
+  const dateStr = `${yyyy}-${mm}-${dd}`;
+
+  const workbook = new ExcelJS.Workbook();
+  const sheet = workbook.addWorksheet('Products');
+
+  sheet.columns = [
+    { header: 'S/N', key: 'sn', width: 6 },
+    { header: 'Product Name', key: 'productName', width: 30 },
+    { header: 'Total Stock', key: 'totalStock', width: 14 },
+    { header: 'Created At', key: 'createdAt', width: 22 },
+  ];
+
+  const rows = [...products].sort((a, b) =>
+    (a.name || '').localeCompare(b.name || '')
+  );
+
+  let sn = 1;
+  for (const p of rows) {
+    sheet.addRow({
+      sn,
+      productName: p.name || '',
+      totalStock: p.totalStock ?? 0,
+      createdAt: new Date(p.createdAt).toISOString().slice(0, 19).replace('T', ' '),
+    });
+    sn++;
+  }
+
+  sheet.getRow(1).font = { bold: true };
+  sheet.views = [{ state: 'frozen', ySplit: 1 }];
+
+  const buffer = await workbook.xlsx.writeBuffer();
+  const filename = `products_${dateStr}.xlsx`;
+  return { buffer, filename };
+}
+
 export async function generateLogsExcel(logs, dateObj = new Date()) {
   const yyyy = dateObj.getFullYear();
   const mm = String(dateObj.getMonth() + 1).padStart(2, '0');

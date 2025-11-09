@@ -12,6 +12,12 @@ export default function TransactionForm({ onSubmitted }) {
   const [message, setMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
+  // Search state and filtered list
+  const [productSearch, setProductSearch] = useState('');
+  const filteredProducts = (products || []).filter(p =>
+    (p.name || '').toLowerCase().includes(productSearch.toLowerCase())
+  );
+
   async function loadProducts() {
     const res = await axios.get('/api/products');
     setProducts(res.data || []);
@@ -46,12 +52,23 @@ export default function TransactionForm({ onSubmitted }) {
       <div className="grid sm:grid-cols-3 gap-4">
         <div>
           <label className="block text-sm text-gray-600 mb-1">Product</label>
+
+          <div className="mb-2">
+            <input
+              type="text"
+              value={productSearch}
+              onChange={(e) => setProductSearch(e.target.value)}
+              placeholder="Search product..."
+              className="w-full border rounded-lg px-3 py-2"
+            />
+          </div>
+
           <select
             className="w-full border rounded-lg px-3 py-2"
             {...register('product', { required: true })}
           >
             <option value="">Select product</option>
-            {products.map(p => (
+            {filteredProducts.map(p => (
               <option key={p._id} value={p._id}>{p.name}</option>
             ))}
           </select>

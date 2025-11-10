@@ -38,12 +38,14 @@ export async function POST(req) {
   // Log events: STOCKED for IN/RESTOCK, REFUNDED for RETURN, OUT_OF_STOCK when stock hits 0 after OUT
   try {
     const { Log } = await import('@/app/lib/models');
-    if (type === 'IN' || type === 'RESTOCK') {
+    if (type === 'IN') {
       await Log.create({ product, event: 'STOCKED' });
+    } else if (type === 'RESTOCK') {
+      await Log.create({ product, event: 'RESTOCK' });
     } else if (type === 'RETURN') {
-      await Log.create({ product, event: 'REFUNDED' });
-    } else if (type === 'OUT' && newStock === 0) {
-      await Log.create({ product, event: 'OUT_OF_STOCK' });
+      await Log.create({ product, event: 'RETURN' });
+    } else if (type === 'OUT') {
+      await Log.create({ product, event: 'STOCKOUT' });
     }
   } catch (_e) {
     // silently ignore logging failures to not block transactions

@@ -15,7 +15,7 @@ const transactionSchema = new mongoose.Schema({
 
 const logSchema = new mongoose.Schema({
   product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
-  event: { type: String, enum: ['STOCKED', 'OUT_OF_STOCK', 'REFUNDED'], required: true },
+  event: { type: String, enum: ['STOCKED', 'OUT_OF_STOCK', 'RETURNED', 'RESTOCK', 'STOCKOUT', 'RETURN'], required: true },
   createdAt: { type: Date, default: Date.now },
 });
 

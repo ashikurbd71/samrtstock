@@ -88,8 +88,12 @@ export async function GET(req) {
 
   const eventToTxType = {
     STOCKED: { type: 'IN', label: 'stock in' },
+    RESTOCK: { type: 'RESTOCK', label: 'restock' },
+    STOCKOUT: { type: 'OUT', label: 'stock out' },
+    RETURN: { type: 'RETURN', label: 'return' },
+    // Backward compatibility
     OUT_OF_STOCK: { type: 'OUT', label: 'stock out' },
-    REFUNDED: { type: 'RETURN', label: 'refund' },
+    RETURNED: { type: 'RETURN', label: 'return' },
   };
 
   const augmented = logs.map((lg) => {

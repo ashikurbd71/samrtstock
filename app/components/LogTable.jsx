@@ -70,12 +70,33 @@ export default function LogTable(props) {
     switch (evt) {
       case 'STOCKED':
         return 'bg-blue-50 text-blue-700';
-      case 'REFUNDED':
-        return 'bg-amber-50 text-amber-700';
+      case 'RESTOCK':
+        return 'bg-emerald-50 text-emerald-700';
       case 'OUT_OF_STOCK':
+      case 'STOCKOUT':
         return 'bg-rose-50 text-rose-700';
+      case 'RETURNED':
+      case 'RETURN':
+        return 'bg-yellow-50 text-yellow-700';
       default:
         return 'bg-gray-100 text-gray-700';
+    }
+  }
+
+  function displayEvent(evt) {
+    switch (evt) {
+      case 'STOCKED':
+        return 'STOCK-IN';
+      case 'RESTOCK':
+        return 'RESTOCK';
+      case 'OUT_OF_STOCK':
+      case 'STOCKOUT':
+        return 'STOCK-OUT';
+      case 'RETURNED':
+      case 'RETURN':
+        return 'RETURN';
+      default:
+        return evt;
     }
   }
 
@@ -232,7 +253,7 @@ export default function LogTable(props) {
                       <td className="py-2.5 px-4 text-left">{log.product?.name || '—'}</td>
                       <td className="py-2.5 px-4 text-center">
                         <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs ${eventChipClasses(log.event)}`}>
-                          {log.event}
+                          {displayEvent(log.event)}
                         </span>
                       </td>
                       <td className="py-2.5 px-4 text-left whitespace-nowrap">{formatDate(log.createdAt)}</td>
